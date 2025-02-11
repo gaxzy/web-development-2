@@ -1,0 +1,47 @@
+# Ignore Node.js dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.vscode/
+.idea/
+.DS_Store
+dist/
+build/
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# Ignore log files
+logs
+*.log
+yarn-error.log
+npm-debug.log
+
+# Ignore TypeScript build artifacts
+*.tsbuildinfo
+
+# Ignore Docker files that should not be committed
+docker-compose.override.yml
+.dockerignore
+
+# Ignore SQLite database (if used)
+*.sqlite
+*.sqlite-journal
+
+# Ignore Knex migrations and seeds (optional)
+migrations/
+seeds/
+
+# Ignore Jest/Testing-related files
+coverage/
+jest.cache/
+jest.debug.log
+
+# Ignore cache files
+.cache/
+.tmp/
+.vscode/
