@@ -8,7 +8,13 @@ dotenv.config();
 const app = express();
 const PORT = Number(process.env.BACKEND_PORT || 5000);
 
-app.use(cors());
+const corsOptions = {
+  origin: process.env.ALLOWED_ORIGIN || "http://localhost:8012",
+  credentials: true,
+  optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Routes
