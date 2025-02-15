@@ -18,12 +18,12 @@ const authenticateUser = (
   next: NextFunction,
 ): void => {
   // check if token starts with 'Bearer ' first.
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+  const authHeader = req.headers.authorization?.split(" ");
+  if (!authHeader || authHeader.length !== 2 || authHeader[0] !== "Bearer") {
     res.status(401).json({ error: "Unauthorized: Invalid token format" });
     return;
   }
-  const token = authHeader.split(" ")[1];
+  const token = authHeader[1];
 
   if (!token) {
     res.status(401).json({ error: "Unauthorized: No token provided" });
@@ -31,10 +31,7 @@ const authenticateUser = (
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
-      id: number;
-    };
-
+    const decoded = verifyToken(token);
     if (!decoded.id) {
       res.status(403).json({ error: "Invalid token structure" });
       return;
@@ -53,6 +50,10 @@ const authenticateUser = (
     }
     res.status(500).json({ error: "Server error" });
   }
+};
+
+const verifyToken = (token: string): { id: number } => {
+  return jwt.verify(token, process.env.JWT_SECRET as string) as { id: number };
 };
 
 export default authenticateUser;

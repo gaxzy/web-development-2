@@ -1,11 +1,8 @@
 import express from "express";
-import dotenv from "dotenv";
 import User from "../models/User";
 import jwt from "jsonwebtoken";
 import authenticateUser from "../middlewares/authMiddleware";
 import { asyncHandler } from "../middlewares/asyncHandler";
-
-dotenv.config();
 
 const router = express.Router();
 
@@ -41,28 +38,21 @@ router.patch(
   "/update",
   authenticateUser,
   asyncHandler(async (req, res) => {
-    console.log("User making the request:", req.user); // Debug log
-
     if (!req.user || !req.user.id) {
       return res.status(401).json({ error: "Unauthorized" });
     }
 
-    const userId = req.user.id;
-    console.log("Extracted userId:", userId); // Debug log
-
     const { username, email } = req.body;
-    console.log("Update data received:", { username, email }); // Debug log
+    const [updated] = await User.update(
+      { username, email },
+      { where: { id: req.user.id } },
+    );
 
-    const user = await User.findByPk(userId);
-    if (!user) {
-      console.error("User not found in database for ID:", userId); // Debug log
+    if (!updated) {
       return res.status(404).json({ error: "User not found" });
     }
 
-    const newUser = await user.update({ username, email });
-    console.log("User updated successfully:", newUser); // Debug log
-
-    res.json({ message: "User updated successfully", newUser });
+    res.json({ message: "User updated successfully", updated });
   }),
 );
 
@@ -105,15 +95,22 @@ router.post(
         error: "Invalid credentials",
       });
 
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET as string, {
-      expiresIn: "1h",
-    });
-
-    res.json({ message: "Login successful", token });
+    try {
+      const token = jwt.sign(
+        { id: user.id },
+        process.env.JWT_SECRET as string,
+        {
+          expiresIn: "1h",
+        },
+      );
+      res.json({ message: "Login successful", token });
+    } catch (error) {
+      res.status(500).json({ message: "Token generation failed" });
+    }
   }),
 );
 
-// PROTECTED: Get user profile (Example usage of `authenticateUser`)
+// GET user profile
 router.get(
   "/profile",
   authenticateUser,
