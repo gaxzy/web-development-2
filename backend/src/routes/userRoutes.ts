@@ -3,15 +3,9 @@ import dotenv from "dotenv";
 import User from "../models/User";
 import jwt from "jsonwebtoken";
 import authenticateUser from "../middlewares/authMiddleware";
-import { Request, Response, NextFunction } from "express";
+import { asyncHandler } from "../middlewares/asyncHandler";
 
 dotenv.config();
-
-export const asyncHandler =
-  (fn: (req: Request, res: Response, next: NextFunction) => Promise<any>) =>
-  (req: Request, res: Response, next: NextFunction) => {
-    Promise.resolve(fn(req, res, next)).catch(next);
-  };
 
 const router = express.Router();
 
