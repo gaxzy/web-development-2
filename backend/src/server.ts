@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import routes from "./routes";
@@ -23,6 +23,16 @@ app.use("/api", routes);
 // Health check endpoint
 app.get("/", (req, res) => {
   res.send("Backend is running");
+});
+
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  console.error("Error:", err.message);
+
+  res.status(500).json({
+    success: false,
+    message: "Something went wrong!",
+    error: process.env.NODE_ENV === "development" ? err.message : undefined,
+  });
 });
 
 app.listen(PORT, "0.0.0.0", () => {
